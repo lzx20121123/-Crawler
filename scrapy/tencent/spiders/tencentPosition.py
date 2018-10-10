@@ -16,7 +16,7 @@ class TencentpositionSpider(scrapy.Spider):
             #初始化模型对象
             item = TencentItem()
 
-            #职位名称
+            #职位名称    exteact()将匹配出来的结果转换为unicode字符串
             item['name'] = each.xpath('./td[1]/a/text()').extract()[0]
             #详情链接
             item['link']= "https://hr.tencent.com/" + each.xpath("./td[1]/a/@href").extract()[0]
