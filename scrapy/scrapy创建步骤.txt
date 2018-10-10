@@ -1,0 +1,4 @@
+1.新建项目：
+scrapy startproject +项目名称
+2.创建爬虫
+scrapy genspider +爬虫名称
