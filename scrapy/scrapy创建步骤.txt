@@ -1,4 +1,4 @@
-1.ĞÂ½¨ÏîÄ¿£º
-scrapy startproject +ÏîÄ¿Ãû³Æ
-2.´´½¨ÅÀ³æ
-scrapy genspider +ÅÀ³æÃû³Æ
+1.æ–°å»ºé¡¹ç›®ï¼š
+scrapy startproject +é¡¹ç›®åç§°
+2.åˆ›å»ºçˆ¬è™«
+è¿›å…¥é¡¹ç›®æ–‡ä»¶å¤¹  è¾“å…¥ï¼š     scrapy genspider +çˆ¬è™«åç§°
