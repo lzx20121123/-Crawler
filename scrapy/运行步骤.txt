@@ -1,1 +1,1 @@
-´ò¿ªcmd  £¬½øÈëµ½tencentÎÄ¼ş¼Ğ  £¬ÊäÈëscrapy crawl tencentPostion£¨ÅÀ³æµÄÃû³Æ£©»Ø³µÔËĞĞ
+æ‰“å¼€cmd  ï¼Œè¿›å…¥åˆ°tencent æ–‡ä»¶å¤¹  ï¼Œè¾“å…¥ scrapy crawl tencentPostionï¼ˆçˆ¬è™«çš„åç§°ï¼‰ -o xxxx.csv   å›è½¦è¿è¡Œ
