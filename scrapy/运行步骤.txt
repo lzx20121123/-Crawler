@@ -1,1 +1,1 @@
-打开cmd  ，进入到tencent 文件夹  ，输入 scrapy crawl tencentPostion（爬虫的名称） -o xxxx.csv   回车运行
+打开cmd  ，进入到tencent 文件夹  ，输入 [[[   scrapy crawl tencentPostion（爬虫的名称） -o xxxx.csv    ]]]  回车运行
