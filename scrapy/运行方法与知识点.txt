@@ -1,6 +1,10 @@
 运行：   打开cmd  ，进入到tencent 文件夹  ，输入 [[[   scrapy crawl tencentPostion（爬虫的名称） -o xxxx.csv    ]]]  回车运行
 
-
+新建项目：
+  scrapy startproject +项目名称
+  
+创建爬虫
+  进入项目文件夹  输入：     scrapy genspider +爬虫名称
 
 加日志的方法：sitting.py文件中，加入以下内容：
   #保存日志信息的文件名
