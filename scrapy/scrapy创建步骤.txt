@@ -1,4 +1,0 @@
-1.新建项目：
-scrapy startproject +项目名称
-2.创建爬虫
-进入项目文件夹  输入：     scrapy genspider +爬虫名称
