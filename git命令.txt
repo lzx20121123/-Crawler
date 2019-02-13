@@ -1,0 +1,9 @@
+git config --global user.email ****@***  				#设置邮箱
+git config --global user.user  **** 					#设置用户
+git clone https://github.com/lzx20121123/UI_Auto_test.git（github地址） #克隆github上的项目到本地
+git add ****    							#添加文件到github暂存区
+git commit    								#提交到本地仓库
+git push 								#仓库文件提交到github仓库， 需要输入github用户名密码
+git pull 								#把远程的更新下载到本地
+
+	https://github.com/lzx20121123/UI_Auto_test.git
