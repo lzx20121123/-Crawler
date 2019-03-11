@@ -1,0 +1,193 @@
+syntax = "proto3";
+//小V智能网关app数据推送服务
+//修改信息或者更新数据的协议，每个字段都需要赋值，如果没有变化的把原来的值带上，服务端不会判断字段是否为空。
+
+message PushServiceRequest {
+	enum ActionType{
+		DEFAULT = 0;
+		REGISTER_ACCOUNT = 1;//注册账号
+		CHANGE_PASSWORD = 2;//修改密码
+		CHANGE_PHONE = 3;//修改手机号
+		GW_BIND = 4;//小V网关绑定
+		DEVICE_UPDATE = 5;//设备信息修改
+		DEVICE_SET = 6;//设备设置
+		URL_LIST = 7;//网址列表：添加信用网址，网络黑名单，白名单
+		EVENT = 8;//创建、修改场景
+		DELETE_EVENT = 9;//删除场景
+		FEEDBACK = 10;//用户反馈
+		CHANGE_ACCOUNT = 11;//修改账号信息，昵称和头像id
+		GW_SET = 12;//小V盒子设置
+		DELETE_DEVICE = 13;//删除设备
+		DELETE_URL = 14;//删除黑白名单
+	}
+	ActionType action_type = 1;//推送数据类型
+	bytes param = 2;//请求参数
+	string app_id = 3;//当前设备唯一id
+}
+
+
+message PushServiceResponse {
+	enum Error{
+		DEFAULT = 0;
+		No_ERR = 1;//没有错误，请求正常
+		EXCEPTION = 2;//服务端异常
+		INVALID_PARAM = 3;//请求参数异常
+		PHONE_CONFLICT = 4;//手机号冲突，已经注册过
+		EMAIL_CONFLICT = 5;//邮箱冲突，已经注册过
+		ACCOUNT_NOT_FOUND = 6;//账号不存在
+	}
+	Error error = 1;//状态
+	string msg = 2;//描述：发生错误时该字段描述错误原因
+	bytes result = 3;//返回结果	
+}
+
+message RegisterAccountParam {
+	string phone_num = 1;//手机号
+	string email = 2;//邮箱
+	string password = 3;//密码（密文,加密规则android、ios和服务端都有）
+	string name = 4;//账号名称
+	string portrait_id = 5;//头像id
+}
+
+message ChangePasswordParam {
+	string account_guid = 1;//账号guid
+	string password = 2;//新密码（密文）
+}
+
+message ChangePhoneParam {
+	string account_guid = 1;
+	string phone_num = 2;
+}
+
+
+message GwBindParam {
+	string account_guid = 1;
+	string gw_guid = 2;//网关唯一guid
+}
+
+message DeviceUpdateParam {
+	string gw_guid = 1;//考虑以后可能会有一个app管理多个设备的需求
+	string mac = 2;
+	string name = 3;
+}
+
+message DeviceSetParam {
+	enum Type {
+		DEFAULT = 0;
+		PROTECT = 1;//是否受小V保护
+		INTERNET = 2;//是否允许联网
+	}
+	
+	message ProtectItem {
+		bool switch = 1;//开关
+	}
+	
+	message InternetItem {
+		bool switch = 1;//开关
+	}
+	string gw_guid = 1;
+	string mac = 2;
+	Type type = 3;//类型
+	bytes data = 4;//对应类型的item序列化的字符串
+}
+
+message UrlListParam {
+	enum Type {
+		DEFAULT = 0;
+		WHITE = 1;//白名单
+		BLACK = 2;//黑名单
+	}
+	string gw_guid = 1;
+	Type type = 2;//类型
+	repeated string url = 3;//url列表
+}
+
+message EventParam {
+	enum Week {
+		DEFAULT = 0;
+		MONDAY = 1;//星期一
+		TUESDAY = 2;
+		WEDNESDAY = 4;
+		THURSDAY = 8;
+		FRIDAY = 16;
+		SATURDAY = 32;
+		SUNDAY = 64;
+	}
+	message TimeItem {
+		int32 hour = 1;
+		int32 minute = 2;
+	}
+	enum SiteType {
+		UNKNOWN = 0;
+		RELIGION = 1;//宗教
+		VIDEO = 2;//视频
+		GAME = 4;//游戏
+		SHOPPING = 8;//购物
+		SOCIAL = 16;//社交
+		ADULT = 32;//色情
+		GOD = 2147483647;//禁用所有网络		
+	}
+	string gw_guid = 1;
+	string event_guid = 2;//场景唯一id(为了保证唯一，生成机制考虑account和设备信息)
+	string name = 3;//场景名称
+	string image_id = 4;//场景头像
+	repeated string device_mac = 5;//管理设备
+	TimeItem start = 6;//起始时间
+	TimeItem end = 7;//结束时间
+	int32 cycle = 8;//周期，计算方法为选中Week枚举值的与运算结果
+	int32 site_type = 9;//网络类型:1、max 值2147483647代表禁用所有网络 2、其他值为选中SiteType枚举值的与运算结果
+	bool is_active = 10;//是否激活
+}
+
+message DeleteEventParam {
+	string gw_guid = 1;
+	repeated string event_guid = 2;
+}
+
+message FeedbackParam {
+	enum Type {
+		DEFAULT = 0;
+		ADVICE = 1;//产品建议
+		BUG = 2;//程序错误
+	}
+	string account_guid = 1;
+	Type type = 2;
+	string content = 3;//反馈内容
+	string contact = 4;//联系方式
+}
+
+message ChangeAccountParam {
+	string account_guid = 1;
+	string name = 2;//账号名称
+	string portrait_id = 3;//头像id
+}
+
+message GwSetParam {
+	enum Type {
+		DEFAULT = 0;
+		STATUS_LED = 1; //小V状态灯
+		DEVICE_ACCESS = 2; //设备准入
+		PROTECT = 3; //安全防护
+		RESTART = 4; //重启小V
+	}
+	string account_guid = 1;
+	string gw_guid = 2;
+	Type type = 3;// 设置类型
+	bool switch = 4;// 开关
+}
+
+message DeleteDeviceParam {
+	string gw_guid = 1;
+	string mac = 2;
+}
+
+message DeleteUrlParam {
+	enum Type {
+		DEFAULT = 0;
+		WHITE = 1;//白名单
+		BLACK = 2;//黑名单
+	}
+	string gw_guid = 1;
+	Type type = 2;//类型
+	repeated string url = 3;//url列表
+}

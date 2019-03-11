@@ -1,0 +1,401 @@
+syntax = "proto3";
+//小V智能网关app数据拉取服务
+
+/*
+备注：
+1、时间戳单位都是以秒为单位
+2、分页参数举例说明,比如一次取50条数据，第一次请求app传offset=0,count=50,
+   app取下50条数据时，offset=50,count=50,以此类推，每次offset+=50
+*/
+
+message PullServiceRequest {
+	enum ActionType {
+		DEFAULT = 0;
+		MSG_AUTHENTICATION_CODE = 1;//获取短信验证码
+		LOGIN = 2;//登录
+		DEVICE_OVERVIEW = 3;//设备信息概况
+		DEVICE_DETAIL = 4;//设备详情
+		THREAT_OVERVIEW = 5;//威胁概况信息
+		THREAT_DETAIL = 6;//威胁详细数据
+		EVENT = 7;//场景信息
+		EVENT_PREVENT = 8;//场景拦截信息
+		ACCOUNT_INFO = 9;//我的页面，账号信息
+		GW_INFO = 10;//小V网关基本信息
+		URL_LIST = 11;//获取网址列表，黑白名单
+		NETFLOW = 12;//网络流量
+		GW_SET = 13;//盒子设置状态
+		DEVICE_NEW = 14;//发现新设备
+		EMAIL = 15;//注册账号发送邮件
+	}
+	ActionType action_type = 1;//拉取数据类型
+	bytes param = 2;//请求参数
+	string app_id = 3;//当前设备唯一id
+}
+
+message PullServiceResponse {
+	enum Error {
+		DEFAULT = 0;
+		No_ERR = 1;//没有错误，请求正常
+		EXCEPTION = 2;//服务端异常
+		INVALID_PARAM = 3;//请求参数异常
+	}
+	Error error = 1;//状态
+	string msg = 2;//描述：发生错误时该字段描述错误原因
+	bytes result = 3;//返回结果	
+}
+
+message MsgAuthenticationCodeParam {
+	enum Type {
+		DEFAULT = 0;
+		REGISTER = 1;//注册验证码
+		CHANGE_PASSWD = 2;//修改密码手机号
+		MSG_LOGIN = 3;//短信验证码登录
+	}
+	string phone_num = 1;//手机号
+	Type msg_type = 2;//短信验证码类型
+}
+
+message MsgAuthenticationCodeResult {
+	enum Status {
+		DEFAULT = 0;
+		SUCCESS = 1;//发送验证码成功
+		REGISTERED = 2;//手机号已经注册过（重复注册判断依据）
+		PHONE_NOT_FOUND = 3;//手机号未注册（修改密码和验证码登录时使用）
+	} 
+	string msg_code = 1;//短信验证码
+	Status status = 2;//发送状态
+}
+
+message LoginParam {
+	enum Type{
+		DEFAULT = 0;
+		PHONE = 1;//手机登录
+		EMAIL = 2;//邮箱登录
+	}
+	string account = 1;//账号
+	Type login_type = 2;//登录类型
+}
+
+message LoginResult {
+	enum Status {
+		DEFAULT = 0;
+		CHECK_PASSWORD = 1;//app验证密码
+		ACCOUNT_NOT_FOUND = 2;//账号未注册
+	}
+	Status login_status = 1;//登录状态
+	string password = 2;//密码（密文）
+	string account_guid = 3;//账号全局唯一id
+	string phone_num = 4;//手机号
+	repeated string gw_guids = 5;//网关guid列表，为了兼容一个账号多网关设备需求
+}
+
+message PagingParam {
+	int64 offset = 1;//取数据的偏移量，起始0
+	int64 count = 2;//取数据的条数
+}
+
+message DeviceOverviewParam {
+	string gw_guid = 1;//以网关guid作为取设备条件，考虑以后可能会有一个app管理多个设备的需求
+	PagingParam page_param = 2;//分页参数
+}
+
+message DeviceOverviewResult {
+	message Item {
+		enum Type {
+			DEFAULT = 0;
+			OTHER = 1;//其他
+			PHONE = 2;//手机
+			PC = 3;//电脑
+			TV = 4;//电视
+			KINDLE = 5;//kindle
+		}
+		string name = 1;//设备名称
+		string ip = 2;//ip
+		bool is_online = 3;//是否在线
+		int64 last_online = 4;//最后在线时间戳
+		repeated string group = 5;//分组列表 
+		string mac = 6;
+		Type type = 7;//设备类型
+	}
+	repeated Item overview_item = 1;
+	int64 online_count = 2;//在线数
+	int64 offline_count = 3;
+}
+
+message DeviceDetailParam {
+	string gw_guid = 1;
+	string mac = 2;//以mac作为设备的唯一标识
+}
+
+message DeviceDetailResult {
+	enum Type {
+		DEFAULT = 0;
+		OTHER = 1;//其他
+		PHONE = 2;//手机
+		PC = 3;//电脑
+		TV = 4;//电视
+		KINDLE = 5;//kindle
+	} 
+	enum Trademark {
+		UNKNOWN = 0;
+		MORE = 1;//其他,不认识的
+		HUAWEI = 2;//华为
+		XIAOMI = 3;//小米
+		APPLE = 4;//苹果
+		SAMSUNG = 5;//三星
+	}
+	string name = 1;
+	repeated string group = 2;
+	Type type = 3;
+	Trademark trademark = 4;//品牌
+	string ip = 5;
+	int64 last_online = 6;//最后在线时间戳
+	bool internet_switch = 7;//是否允许联网
+	bool protect_switch = 8;//是否受小V保护
+}
+
+message ThreatOverviewParam {
+	enum TimeType {
+		DEFAULT = 0;
+		LAST_DAY = 1;//最近一天
+		LAST_WEEK = 2;//最近7天
+		LAST_MONTH = 3;//最近一个月
+	}
+	TimeType time_type = 1;//时间类型
+	int64 current_time = 2;//当前时间对应的时间戳
+	string gw_guid = 3;
+}
+
+message ThreatItem {
+	enum Type {
+		DEFAULT = 0;
+		SITE = 1;//恶意网址
+		IP = 2;//恶意ip
+		DNS = 3;//恶意DNS
+		VIRUS = 4;//病毒木马
+		ATTACT = 5;//恶意入侵
+	}
+	enum Status {
+		UNKNOWN = 0;
+		FOUND = 1;//新发现
+		PREVENT = 2;//已阻止(已拦截)
+	}
+	string device_mac = 1;//设备mac
+	string device_name = 2;//设备名称
+	Type threat_type = 3;//威胁类型
+	string content = 4;//威胁概述内容,根据类型传，如恶意ip:只传ip地址
+	Status threat_status = 5;//威胁状态	
+	int64 attact_time = 6;//威胁发生时间
+	string description = 7;//威胁详情描述
+	bool is_read = 8;//是否已读（固定值false，为了app代码中状态位添加）
+	string item_id =9;//威胁唯一id
+}
+
+/*坐标值规则
+  最近1天：6个点，每4个小时统计一次；00：00，04：00，08：00，12：00，16：00，20：00
+  最近7天：七个点，每天统计一次；eg:09.02，09.03，09.04，09.05，09.06，09.07，09.08
+  最近30天:6个点，五天统计一次；eg：08.25，08.30，09.04，09.09，09.14，09.19
+*/
+message ThreatOverviewResult {
+	int64 device_count = 1;//保护设备数量
+	int64 total_count = 2;//威胁总数
+	int64 netflow_count = 3;//受保护流量(单位:KB)
+	repeated int64 point_value = 4;//坐标值，固定返回6个
+}
+
+message ThreatDetailParam {
+	string gw_guid = 1;
+	int64 start_time = 2;//起始时间（如果条件中不需要时间参数，则传0）
+	int64 end_time = 3;//结束时间
+	string device_mac = 4;
+	PagingParam page_param = 5;//分页参数
+}
+
+message ThreatDetailResult {
+	int64 total_count = 1;//威胁总数
+	repeated ThreatItem threat_item = 2;//威胁明细数据
+}
+
+message EventParam {
+	string gw_guid = 1;
+	PagingParam page_param = 2;//分页参数
+}
+message EventResult {
+	enum Week {
+		DEFAULT = 0;
+		MONDAY = 1;//星期一
+		TUESDAY = 2;
+		WEDNESDAY = 4;
+		THURSDAY = 8;
+		FRIDAY = 16;
+		SATURDAY = 32;
+		SUNDAY = 64;
+	}
+	message TimeItem {
+		int32 hour = 1;
+		int32 minute = 2;
+	}
+	enum SiteType {
+		UNKNOWN = 0;
+		RELIGION = 1;//宗教
+		VIDEO = 2;//视频
+		GAME = 4;//游戏
+		SHOPPING = 8;//购物
+		SOCIAL = 16;//社交
+		ADULT = 32;//色情	
+	}
+	message DeviceInfo{
+		string mac = 1;
+		string name = 2;
+	}
+	message EventItem {
+		int64 create_time = 1;//创建时间
+		string event_guid = 2;//场景唯一id(为了保证唯一，生成机制考虑account和设备信息)
+		string name = 3;//场景名称
+		string image_id = 4;//场景头像
+		repeated DeviceInfo device = 5;//管理设备
+		TimeItem start = 6;//起始时间
+		TimeItem end = 7;//结束时间
+		int32 cycle = 8;//周期，计算方法为选中Week枚举值的与运算结果
+		int32 site_type = 9;//网络类型，计算方法为选中SiteType枚举值的与运算结果
+		bool is_active = 10;//是否激活
+		int64 prevent_count = 11;//场景拦截次数
+	}
+	int64 total_count = 1;//场景总个数
+	repeated EventItem event = 2;//场景信息
+}
+
+message EventPreventParam {
+	string gw_guid = 1;
+	int64 start_time = 2;//起始时间（如果条件中不需要时间参数，则传0）
+	int64 end_time = 3;//结束时间
+	string event_guid = 4;
+	PagingParam page_param = 5;//分页参数
+}
+
+message EventPreventResult {
+	message PreventItem {
+		string content = 1;//拦截简述
+		string device_name = 2;//设备名称
+		int64 prevent_time = 3;//拦截时间
+		string event_name = 4;//场景名称
+		string item_id = 5;//拦截唯一id
+	}
+	int64 total_count = 1;//总数
+	repeated PreventItem item = 2;//拦截记录
+}
+
+message AccountInfoParam {
+	string account_guid = 1;
+}
+
+message AccountInfoResult {
+	message GwInfo {
+		string gw_guid = 1;
+		bool gw_active = 2;//小V保护状态
+	}
+	string name = 1;
+	string portrait_id = 2;//头像id
+	string email = 3;
+	string phone_num = 4;
+	repeated GwInfo gw_info = 5;//网关信息，考虑以后一个账号管理多个网关情况
+}
+
+message GwInfoParam {
+	string account_guid = 1;//账号guid
+}
+
+message GwInfoResult {
+	message GwItem {
+		string version = 1;//软件版本
+		string wifi_name = 2;//wifi名称
+		int64 start_time = 3;//启动时间
+		string firmware_version = 4;//固件版本
+		string hardware_model= 5;//硬件型号,处理器
+		bool is_online = 6;//是否联网
+		string size = 7;//尺寸
+		int32 weight = 8;//重量
+	}
+	repeated GwItem item = 1;//网关记录项
+}
+
+message UrlListParam {
+	enum Type {
+		DEFAULT = 0;
+		WHITE = 1;//白名单
+		BLACK = 2;//黑名单
+	}
+	string gw_guid = 1;
+	Type type = 2;
+	PagingParam page_param = 3;//分页参数
+}
+
+message UrlListResult {
+	repeated string url = 1;//url列表
+}
+
+message NetflowParam{
+	string gw_guid = 1;
+	string device_mac = 2;
+	int64 start_time = 3;//起始时间（如果条件中不需要时间参数，则传0）
+	int64 end_time = 4;//结束时间
+}
+
+message NetflowResult{
+	int64 pkt_count = 1;//数据包数量
+	int64 traffic_count = 2;//字节数量(单位：KB)
+}
+
+message GwSetParam{
+	string account_guid = 1;
+	string gw_guid = 2;
+}
+
+message GwSetResult {
+	bool status_led = 1; //小v状态灯
+	bool device_access = 2; //设备准入
+	bool protect = 3; //安全防护
+}
+
+message DeviceNewParam {
+	string gw_guid = 1;
+	int64 start_time = 2;//起始时间（因为没有做分页，时间参数必传）
+	int64 end_time = 3;//结束时间
+}
+
+message DeviceNewResult {
+	message Item {
+		string name = 1;//设备名称
+		string mac = 2;
+		bool internet_switch = 3;//是否允许联网
+	}
+	repeated Item device_item = 1;
+}
+
+message EmailParam {
+	enum Type {
+		DEFAULT = 0;
+		CHANGE_PASSWD = 1;//邮箱找回密码
+	}
+	string email = 1;//邮箱
+	Type send_type = 2;//发送邮件类型
+}
+
+message EmailResult {
+	enum Status {
+		DEFAULT = 0;
+		SUCCESS = 1;//邮件发送成功
+		EMAIL_NOT_FOUND = 2;//邮箱未注册
+	}
+	Status send_status = 1;//登录状态
+	string msg = 2;//发生错误时返回错误信息
+}
+
+
+
+
+
+
+
+
+

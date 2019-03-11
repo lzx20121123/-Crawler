@@ -1,0 +1,2 @@
+pull,https://211.159.167.112:9001/app/pull,post
+push,https://211.159.167.112:9002/app/push,post
