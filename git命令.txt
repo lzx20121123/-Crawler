@@ -1,9 +1,15 @@
-git config --global user.email ****@***  				#ÉèÖÃÓÊÏä
-git config --global user.user  **** 					#ÉèÖÃÓÃ»§
-git clone https://github.com/lzx20121123/UI_Auto_test.git£¨githubµØÖ·£© #¿ËÂ¡githubÉÏµÄÏîÄ¿µ½±¾µØ
-git add ****    							#Ìí¼ÓÎÄ¼şµ½githubÔİ´æÇø
-git commit    								#Ìá½»µ½±¾µØ²Ö¿â
-git push 								#²Ö¿âÎÄ¼şÌá½»µ½github²Ö¿â£¬ ĞèÒªÊäÈëgithubÓÃ»§ÃûÃÜÂë
-git pull 								#°ÑÔ¶³ÌµÄ¸üĞÂÏÂÔØµ½±¾µØ
+git config --global user.email ****@***  				#è®¾ç½®é‚®ç®±
+git config --global user.user  **** 					#è®¾ç½®ç”¨æˆ·
+git clone https://github.com/lzx20121123/UI_Auto_test.gitï¼ˆgithubåœ°å€ï¼‰ #å…‹éš†githubä¸Šçš„é¡¹ç›®åˆ°æœ¬åœ°
+git add ****    							#æ·»åŠ æ–‡ä»¶åˆ°githubæš‚å­˜åŒº
+git commit    								#æäº¤åˆ°æœ¬åœ°ä»“åº“
+git push 								#ä»“åº“æ–‡ä»¶æäº¤åˆ°githubä»“åº“ï¼Œ éœ€è¦è¾“å…¥githubç”¨æˆ·åå¯†ç 
+git pull 								#æŠŠè¿œç¨‹çš„æ›´æ–°ä¸‹è½½åˆ°æœ¬åœ°
 
-	https://github.com/lzx20121123/UI_Auto_test.git
+#åˆ é™¤githubä¸Šçš„æ–‡ä»¶å¤¹ å‚è€ƒï¼šhttps://blog.csdn.net/qq_38931949/article/details/82669240
+
+1.ä¸‹è½½åˆ°æœ¬åœ°
+2.è¿›å…¥åˆ°ç›®å½•
+3.git rm -r --cached æ–‡ä»¶å¤¹åç§°
+4.git commit -m 'delete æ–‡ä»¶å¤¹åç§° dir'
+5.git push -u origin master
