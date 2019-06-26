@@ -13,3 +13,5 @@ git pull 								#把远程的更新下载到本地
 3.git rm -r --cached 文件夹名称
 4.git commit -m 'delete 文件夹名称 dir'
 5.git push -u origin master
+
+一篇比较好的git文章，介绍的比较详细。http://www.ruanyifeng.com/blog/2014/06/git_remote.html
